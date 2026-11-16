@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Segurança: limita o que a página pode carregar (scripts só deste site, sem envio de dados para fora) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Painel de resultados – New Digital Midia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Tela de bloqueio (aparece quando o PIN está ativo e o painel está bloqueado) -->
+  <section id="tela-bloqueio" class="tela-bloqueio" hidden>
+    <div class="bloco caixa-bloqueio">
+      <h2>Painel bloqueado</h2>
+      <p class="texto-apoio">Digite o PIN para ver os resultados.</p>
+      <input id="pin-bloqueio" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN">
+      <button class="principal" id="botao-desbloquear">Entrar</button>
+      <p id="mensagem-bloqueio" class="texto-apoio" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- Topo colorido: título, período e abas (Painel / Conexões) -->
+  <header class="topo">
+    <div class="topo-conteudo">
+      <div class="topo-linha">
+        <div>
+          <h1>Painel de resultados</h1>
+          <p>New Digital Midia · marketing digital em um só lugar</p>
+        </div>
+        <div class="botoes" id="botoes-periodo">
+          <button data-dias="7">Últimos 7 dias</button>
+          <button data-dias="30" class="ativo">Últimos 30 dias</button>
+        </div>
+      </div>
+      <nav class="abas" id="abas">
+        <button data-tela="painel" class="ativo">Painel</button>
+        <button data-tela="conexoes" id="aba-conexoes">Conexões</button>
+        <button data-tela="seguranca">Segurança</button>
+        <button id="botao-privacidade" class="botao-privacidade" aria-pressed="false">Ocultar números</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ TELA 1: PAINEL ============ -->
+    <div id="tela-painel">
+
+      <!-- Aviso de quantos canais estão conectados -->
+      <p class="aviso" id="aviso-conexoes"></p>
+
+      <!-- Aparece quando nenhum canal está conectado -->
+      <section class="bloco vazio" id="sem-conexao" hidden>
+        <h2>Nenhum canal conectado</h2>
+        <p>Conecte pelo menos uma rede para ver os resultados aqui.</p>
+        <button class="principal" data-ir-para="conexoes">Conectar canais</button>
+      </section>
+
+      <div id="conteudo-painel">
+
+        <!-- Escolha do canal (os botões são criados pelo script.js) -->
+        <section class="bloco">
+          <h2>Canal</h2>
+          <div class="botoes" id="botoes-canal"></div>
+        </section>
+
+        <!-- Números principais do site -->
+        <section id="indicadores" class="indicadores"></section>
+
+        <!-- Gráfico -->
+        <section class="bloco">
+          <h2 id="titulo-grafico">Dia a dia</h2>
+          <div class="botoes" id="botoes-metrica">
+            <button data-metrica="visitas" class="ativo">Visitas no site</button>
+            <button data-metrica="alcance">Pessoas alcançadas</button>
+          </div>
+          <svg id="grafico" viewBox="0 0 700 240" role="img" aria-label="Gráfico de linha dia a dia"></svg>
+          <p id="detalhe-dia" class="texto-apoio">Passe o mouse (ou toque) no gráfico para ver cada dia.</p>
+        </section>
+
+        <!-- Funil: da publicação até o contato -->
+        <section class="bloco">
+          <h2>Da publicação até o contato</h2>
+          <div id="funil"></div>
+        </section>
+
+        <!-- Reação do público: visualizações, curtidas e comentários -->
+        <section class="bloco">
+          <h2>Reação do público</h2>
+          <div class="botoes" id="botoes-tipo">
+            <button data-tipo="tudo" class="ativo">Publicações e stories</button>
+            <button data-tipo="publicacoes">Só publicações</button>
+            <button data-tipo="stories">Só stories</button>
+          </div>
+          <div id="indicadores-reacao" class="indicadores"></div>
+          <div id="sentimento"></div>
+        </section>
+
+        <!-- Lista de publicações e stories, uma por uma -->
+        <section class="bloco">
+          <h2>Publicação por publicação</h2>
+          <div class="botoes" id="botoes-ordem">
+            <button data-ordem="visualizacoes" class="ativo">Mais vistas</button>
+            <button data-ordem="curtidas">Mais curtidas</button>
+            <button data-ordem="negativos">Mais comentários negativos</button>
+          </div>
+          <div class="tabela-rolagem">
+            <table id="tabela-publicacoes"></table>
+          </div>
+          <p class="texto-apoio">⚠ = mais de 20% dos comentários são negativos. Mostrando as 8 primeiras.</p>
+        </section>
+
+        <!-- Comparação entre os canais conectados -->
+        <section class="bloco">
+          <h2>Comparação entre canais</h2>
+          <div class="tabela-rolagem">
+            <table id="comparacao"></table>
+          </div>
+          <p class="texto-apoio">★ = canal que mais gerou contatos no período.</p>
+        </section>
+
+        <!-- Resumo em frases simples -->
+        <section class="bloco">
+          <h2>Resumo</h2>
+          <ul id="resumo"></ul>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ============ TELA 2: CONEXÕES ============ -->
+    <div id="tela-conexoes" hidden>
+      <section class="bloco">
+        <h2>Conecte suas redes</h2>
+        <p class="texto-apoio">Cada rede conectada passa a aparecer no painel. A conexão é somente leitura: o painel só lê os números, nunca publica nem apaga nada.</p>
+        <div class="botoes acoes-conexao">
+          <button class="principal" id="botao-conectar-todos">Conectar todos (demonstração)</button>
+          <button id="botao-desconectar-todos">Desconectar todos</button>
+        </div>
+      </section>
+      <div id="lista-conexoes" class="conexoes"></div>
+    </div>
+
+    <!-- ============ TELA 3: SEGURANÇA ============ -->
+    <div id="tela-seguranca" hidden>
+
+      <section class="bloco">
+        <h2>Bloqueio por PIN</h2>
+        <p class="texto-apoio">Protege o painel de quem usa o seu computador ou celular. Com o PIN ativo, o painel bloqueia sozinho após 5 minutos sem uso.</p>
+        <p><strong id="estado-pin"></strong></p>
+        <label class="rotulo" for="pin-campo">PIN (4 a 6 números)</label>
+        <input id="pin-campo" type="password" inputmode="numeric" maxlength="6" autocomplete="off">
+        <div class="botoes" id="acoes-pin"></div>
+        <p id="mensagem-pin" class="texto-apoio" aria-live="polite"></p>
+        <p class="nota-demo">O PIN protege contra quem olha a tela ou pega o aparelho. Para uma proteção forte, a versão final precisa de login em servidor.</p>
+      </section>
+
+      <section class="bloco">
+        <h2>Como o painel protege seus dados</h2>
+        <ul id="lista-verificacoes" class="verificacoes"></ul>
+        <p class="texto-apoio">Use o botão “Ocultar números” no topo antes de compartilhar a tela em uma reunião.</p>
+      </section>
+
+      <section class="bloco">
+        <h2>LGPD e dados pessoais</h2>
+        <ul>
+          <li>Comentários de seguidores podem ter nome e outros dados pessoais. Na versão final, o painel mostra só totais, sem nomes nem textos completos.</li>
+          <li>Colete apenas o necessário para a finalidade combinada (princípios da Lei nº 13.709/2018).</li>
+          <li>Os dados dos clientes seguem as regras do contrato firmado com cada um.</li>
+        </ul>
+      </section>
+
+      <section class="bloco">
+        <h2>Se algo der errado</h2>
+        <ol>
+          <li>Desconecte todas as redes na aba Conexões e troque as senhas delas.</li>
+          <li>Troque o PIN e apague os dados deste aparelho (botão abaixo).</li>
+          <li>Avise os clientes envolvidos e anote o que aconteceu, quando e quais dados foram afetados.</li>
+          <li>Se houver dados pessoais, avalie com apoio jurídico a comunicação à ANPD e aos titulares, como pede a LGPD.</li>
+        </ol>
+      </section>
+
+      <section class="bloco">
+        <h2>Dados salvos neste aparelho</h2>
+        <p class="texto-apoio">O painel guarda só quais canais estão conectados e, se você ativar, o resumo criptografado do PIN. Nunca guarda senhas das redes.</p>
+        <button id="botao-limpar">Apagar dados deste aparelho</button>
+        <p id="mensagem-limpeza" class="texto-apoio" aria-live="polite"></p>
+      </section>
+
+    </div>
+
+    <footer class="texto-apoio">
+      <button id="botao-atualizar">Atualizar dados</button>
+      <span id="ultima-atualizacao"></span>
+    </footer>
+
+  </main>
+
+  <!-- Janela que simula a autorização de uma rede -->
+  <dialog id="janela-conexao"></dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
